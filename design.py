@@ -1,0 +1,10 @@
+def pattern():
+    print(" ")
+    print(" ")
+    print("="*312)
+    print("="*312)
+    print(" "*215,"KIA SALES  MANAGEMENT ANALYSIS")
+    print("="*312)
+    print("="*312)
+    print(" ")
+    print(" ")
