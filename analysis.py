@@ -2,57 +2,84 @@ import pymysql
 import pandas as pd
 from tabulate import tabulate
 import warnings
+
 warnings.filterwarnings('ignore')
-conn= pymysql.connect(user = 'root',
-                              host = 'localhost',
-                              passwd='123',    
-                              database = 'sales_analysis',
-                              charset='utf8')
-cursor=conn.cursor()
+
+conn = pymysql.connect(
+    user='root', host='localhost', passwd='123', database='sales_analysis', charset='utf8'
+)
+
+_DF_CACHE = None
+
+
+def _input_int(prompt: str, default: int = 5) -> int:
+    try:
+        val = int(input(prompt + ": ").strip())
+        return max(0, val)
+    except Exception:
+        return default
+
+
+def get_sales_df(refresh: bool = False) -> pd.DataFrame:
+    global _DF_CACHE
+    if _DF_CACHE is None or refresh:
+        _DF_CACHE = pd.read_sql("SELECT * FROM sales_report", conn)
+    return _DF_CACHE
+
+
 def report_summary():
-    q="select*from sales_report;"
-    df=pd.read_sql(q,conn)
-    print(df.describe())
+    df = get_sales_df()
+    print(tabulate(df.describe(), headers="keys", tablefmt="psql"))
+
+
 def search_index():
-    q="select*from sales_report;"
-    df=pd.read_sql(q,conn)
-    print(df.index)
+    df = get_sales_df()
+    print(list(df.index))
+
+
 def search_columns():
-    q="select*from sales_report;"
-    df=pd.read_sql(q,conn)
-    print(df.columns)
+    df = get_sales_df()
+    print(list(df.columns))
+
+
 def search_datatypes():
-    q="select*from sales_report;"
-    df=pd.read_sql(q,conn)
+    df = get_sales_df()
     print(df.dtypes)
+
+
 def search_values():
-    q="select*from sales_report;"
-    df=pd.read_sql(q,conn)
+    df = get_sales_df()
     print(df.values)
+
+
 def search_shape():
-    q="select*from sales_report;"
-    df=pd.read_sql(q,conn)
+    df = get_sales_df()
     print(df.shape)
+
+
 def search_size():
-    q="select*from sales_report;"
-    df=pd.read_sql(q,conn)
+    df = get_sales_df()
     print(df.size)
+
+
 def search_transpose():
-    q="select*from sales_report;"
-    df=pd.read_sql(q,conn)
+    df = get_sales_df()
     print(df.T)
+
+
 def search_head():
-    q="select*from sales_report;"
-    df=pd.read_sql(q,conn)
-    a=int(input("HOW MANY VALUES YOU WANT TO SEE:"))
-    print(df.head(a))          
+    df = get_sales_df()
+    a = _input_int("HOW MANY VALUES YOU WANT TO SEE", 5)
+    print(tabulate(df.head(a), headers="keys", tablefmt="psql", showindex=False))
+
+
 def search_tail():
-    q="select*from sales_report;"
-    df=pd.read_sql(q,conn)
-    a=int(input("HOW MANY VALUES YOU WANT TO SEE:"))
-    print(df.tail(a))
+    df = get_sales_df()
+    a = _input_int("HOW MANY VALUES YOU WANT TO SEE", 5)
+    print(tabulate(df.tail(a), headers="keys", tablefmt="psql", showindex=False))
+
+
 def search_empty():
-    q="select*from sales_report;"
-    df=pd.read_sql(q,conn)
+    df = get_sales_df()
     print(df.empty)
  
